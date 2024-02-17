@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Login } from "@/components/login";
+import { LoginButton } from "@/components/login-button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +18,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className + " mt-16"}>
+        <>
+          <div className="fixed top-0 flex items-center justify-between w-screen py-4 px-8 bg-white shadow-md max-sm:px-1">
+            <a href="/" className="text-xl">
+              Acceuil
+            </a>
+            <nav className="flex items-center justify-between">
+              <a
+                href="/about"
+                className="mr-4 border-r-2 border-x-zinc-400 pr-4"
+              >
+                À Propos
+              </a>
+              <br />
+              <LoginButton />
+            </nav>
+          </div>
+          <Login />
+          {children}
+        </>
+      </body>
     </html>
   );
 }
