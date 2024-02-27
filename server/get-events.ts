@@ -1,10 +1,11 @@
-"use server";
+'use server';
 
-import { EventListType, EventType } from "@/types/event";
+import { EventListType, EventType } from '@/types/event';
+import { User } from 'firebase/auth';
 
-var admin = require("firebase-admin");
+var admin = require('firebase-admin');
 
-var serviceAccount = require("../config/glo-3202-11082-firebase-adminsdk-j10eb-9f66058cd4.json");
+var serviceAccount = require('../config/glo-3202-11082-firebase-adminsdk-j10eb-9f66058cd4.json');
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -18,9 +19,8 @@ const db = admin.firestore();
 const eventsCached: EventListType = [];
 
 export const getEventsList = async () => {
-  console.log("getEventsList");
   if (eventsCached.length === 0) {
-    const events = await db.collection("events").get();
+    const events = await db.collection('events').get();
     events.forEach((eventData: any) => {
       const event = eventData.data();
       delete event.attendees;
@@ -38,32 +38,28 @@ export const getEvent = async (eventId: string) => {
 };
 
 export const addEvent = async (event: EventType) => {
-  console.log("addEvent", event);
+  console.log('addEvent', event);
 
-  const docRef = db.collection("events").doc(event.eventId);
+  const docRef = db.collection('events').doc(event.eventId);
   await docRef.set(event);
 };
 
-export const saveUserRegistration = async (
-  event: EventType,
-  user: { email: string; password: string },
-  zone: string
-) => {
-  const docRef = db.collection("events").doc(event.eventId);
+export const saveUserRegistration = async (event: EventType, user: User, zone: string) => {
+  const docRef = db.collection('events').doc(event.eventId);
   const eventDoc = await docRef.get();
   const attendees = eventDoc.data().attendees ?? [];
   if (!eventDoc.exists) {
-    console.log("No such document!");
-    return "Événement non trouvé!";
+    console.log('No such document!');
+    return 'Événement non trouvé!';
   } else if (eventDoc.data().zones[zone].availableSeats === 0) {
-    console.log("No available seats!");
-    return "Pas de places disponibles!";
+    console.log('No available seats!');
+    return 'Pas de places disponibles!';
   } else if (attendees.find((attendee: any) => attendee.email === user.email)) {
-    console.log("User already registered!");
-    return "Billet déjà réservé!";
+    console.log('User already registered!');
+    return 'Billet déjà réservé!';
   }
 
-  if (zone === "ZIP") {
+  if (zone === 'ZIP') {
     await docRef.update({
       zones: {
         ZIP: {
@@ -78,7 +74,7 @@ export const saveUserRegistration = async (
         },
       },
     });
-  } else if (zone === "GA_ADMISSION") {
+  } else if (zone === 'GA_ADMISSION') {
     await docRef.update({
       zones: {
         ZIP: {
@@ -95,7 +91,7 @@ export const saveUserRegistration = async (
     });
   }
   await docRef.update({
-    attendees: attendees.concat(user),
+    attendees: attendees.concat(user.email),
   });
-  return "Billet réservé!";
+  return 'Billet réservé!';
 };

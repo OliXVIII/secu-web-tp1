@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { EventListType } from "@/types/event";
-import { useEffect, useState } from "react";
+import { EventListType } from '@/types/event';
+import { useEffect, useState } from 'react';
 
 export const MyEvents = () => {
   const [events, setEvents] = useState<EventListType>([]);
 
   useEffect(() => {
-    const eventsString = localStorage?.getItem("events");
+    const eventsString = localStorage?.getItem('events');
     if (eventsString) {
       setEvents(JSON.parse(eventsString));
     }
@@ -17,24 +17,22 @@ export const MyEvents = () => {
     return;
   } else {
     return (
-      <div>
+      <>
         <h2 className="text-2xl text-center font-bold">Vos événements</h2>
-        <ul className="flex ">
+        <div className="flex flex-nowrap overflow-x-auto w-full scroll-smooth">
           {events.map((event) => (
-            <li
+            <div
               key={event.eventId}
-              className="border-2 border-gray-200 p-4 m-4 rounded-md shadow-md"
+              className="border-2 border-gray-200 p-4 m-4 rounded-md shadow-md w-96"
+              style={{ flex: '0 0 auto' }}
             >
               <h3>{event.eventName}</h3>
               <p className="text-sm w-full text-end">{event.eventDate}</p>
               <p>Location: {event.location}</p>
               <p className="py-2">{event.description}</p>
-              <ul className="grid grid-cols-4 gap-2">
+              <ul className="sm:grid grid-cols-1 sm:gap-2">
                 {Object.entries(event.zones).map(([zone, details]) => (
-                  <li
-                    key={zone}
-                    className="border-2 border-gray-200 p-4 m-4 rounded-md shadow-md"
-                  >
+                  <li key={zone} className="border-2 border-gray-200 p-4 m-4 rounded-md shadow-md">
                     <h4 className="underline w-full text-center">{zone}</h4>
                     <p>Total seats: {details.totalSeats}</p>
                     <p>Available seats: {details.availableSeats}</p>
@@ -48,10 +46,10 @@ export const MyEvents = () => {
               >
                 Voir détails
               </a>
-            </li>
+            </div>
           ))}
-        </ul>
-      </div>
+        </div>
+      </>
     );
   }
 };
