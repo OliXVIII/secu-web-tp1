@@ -11,9 +11,6 @@ export default function Home() {
           <a href="/about">À Propos</a>
         </button>
         <br />
-        {/* <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          <a href="/events/create">Créer un événement</a>
-        </button> */}
       </div>
     </main>
   );

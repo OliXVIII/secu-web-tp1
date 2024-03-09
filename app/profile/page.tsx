@@ -28,14 +28,7 @@ const ProfilePage = () => {
   return (
     <div className="pt-16 justify-center text-center">
       <h1>Profile</h1>
-      <p>Modifier mot de passe sécuritairement pour {currentUser?.displayName}</p>
-      <input type="password" placeholder="Nouveau mot de passe" className="border border-gray-200 p-1 mt-2 rounded-md" />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 ml-4 rounded mt-5 w-40 mx-auto"
-        onClick={submiteNewPassword}
-      >
-        Connecter
-      </button>
+      {!currentUser ? <p>Connectez-vous pour voir votre profile</p> : <p>Bonjour {currentUser?.email}</p>}
     </div>
   );
 };

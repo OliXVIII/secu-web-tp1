@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { saveUserRegistration } from '@/server/get-events';
 import { EventType } from '@/types/event';
 import Cookie from 'js-cookie';
-import { auth } from '@/config/firebaseConfig'; // Assuming this now exports auth
+import { auth } from '@/config/firebaseConfig';
 import { User, onAuthStateChanged } from 'firebase/auth';
 
 type BuyTicketProps = {
@@ -40,22 +40,27 @@ export const BuyTicket = ({ event, zone }: BuyTicketProps) => {
       });
       return;
     } else {
-      const events = JSON.parse(localStorage.getItem('events') ?? '[]');
-      events.push(event);
-      localStorage.setItem('events', JSON.stringify(events));
-      const response: string = await saveUserRegistration(event, currentUser, zone);
-      setMessage(response);
+      if (currentUser?.email !== null) {
+        const response: string = await saveUserRegistration(event, currentUser?.email, zone);
 
-      if (response === 'Billet réservé!' || response === 'Billet déjà réservé!') {
-        setHideBuyButton(true);
-        Cookie.set(event.eventName.replaceAll(' ', '-'), 'true');
-      } else if (response === 'Pas de places disponibles!') {
-        alert('Pas de places disponibles!');
+        if (response === 'Billet réservé!') {
+          const events = JSON.parse(localStorage.getItem('events') ?? '[]');
+          events.push(event);
+          localStorage.setItem('events', JSON.stringify(events));
+        }
+        setMessage(response);
+
+        if (response === 'Billet réservé!' || response === 'Billet déjà réservé!') {
+          setHideBuyButton(true);
+          Cookie.set(event.eventId, 'true');
+        } else if (response === 'Pas de places disponibles!') {
+          alert('Pas de places disponibles!');
+        }
+        dialogRef.current?.showModal();
+        setTimeout(() => {
+          dialogRef.current?.close();
+        }, 1500);
       }
-      dialogRef.current?.showModal();
-      setTimeout(() => {
-        dialogRef.current?.close();
-      }, 1500);
     }
   };
 

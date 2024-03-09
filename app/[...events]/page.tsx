@@ -8,6 +8,7 @@
 import { getEvent } from '@/server/get-events';
 import { EventType } from '@/types/event';
 import { BuyTicket } from '@/components/buy-ticket';
+import Image from 'next/image';
 
 const EventsPage = async ({ params }: { params: { events: string[] } }) => {
   const event: EventType | undefined = await getEvent(params.events[1]);
@@ -16,6 +17,15 @@ const EventsPage = async ({ params }: { params: { events: string[] } }) => {
   } else {
     return (
       <div className="flex flex-col items-center justify-between p-24 max-sm:p-2 @container">
+        <Image
+          src={
+            'https://www.quebec-cite.com/sites/otq/files/styles/gallery_desktop/public/media/image/Festival_ete_quebec.jpg?itok=EFf_R7-l'
+          }
+          alt={event.eventName}
+          width={300}
+          height={200}
+          className="w-full h-48 object-cover rounded-md shadow-md"
+        />
         <h1>{event.eventName}</h1>
         <p>{event.eventDate}</p>
         <p>{event.location}</p>

@@ -11,6 +11,7 @@ export const Login = () => {
     const passwordElement = document.querySelector('input[type="password"]');
 
     if (typeof window === 'undefined') {
+      console.error('You must import this file in a client-side code');
       throw new Error('You must import this file in a client-side code');
     }
 
@@ -25,14 +26,21 @@ export const Login = () => {
 
       try {
         // Try signing in the user
+        if (auth.currentUser) {
+          alert('Utilisateur déjà connecté');
+          return;
+        } else if (!email || !password) {
+          alert('Veuillez entrer un email et un mot de passe.');
+          return;
+        }
         await signInWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
+            alert('Utilisateur connecté');
             console.log(`Utilisateur connecté:`, userCredential.user);
           })
           .catch((error) => {
-            console.error('Authentication failed:', error.code, error.message);
+            throw error;
           });
-        localStorage.setItem('isUserLoggedIn', 'true');
         dialogRef.current?.close();
       } catch (error: any) {
         console.error('Authentication failed:', error.code, error.message);
@@ -41,12 +49,14 @@ export const Login = () => {
         if (error.code === 'auth/invalid-email') {
           alert('Invalid email address format.');
         } else if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+          console.log('HERE');
           try {
             createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+              alert('Utilisateur créé');
               console.log('User created:', userCredential.user);
             });
-            localStorage.setItem('isUserLoggedIn', 'true');
           } catch (creationError: any) {
+            alert('Mot de passe incorrect');
             console.error('User creation failed:', creationError.code, creationError.message);
 
             // Handle user creation errors without giving specific details about the error

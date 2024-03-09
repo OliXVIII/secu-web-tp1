@@ -1,24 +1,49 @@
 'use client';
 
+import { auth } from '@/config/firebaseConfig';
 import { EventListType } from '@/types/event';
+import { User, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
 export const MyEvents = () => {
   const [events, setEvents] = useState<EventListType>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const eventsString = localStorage?.getItem('events');
-    if (eventsString) {
-      setEvents(JSON.parse(eventsString));
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user) {
+        const eventsString = localStorage?.getItem('events');
+        if (eventsString) {
+          setEvents(JSON.parse(eventsString));
+        }
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   if (events.length === 0) {
-    return;
+    return (
+      <a
+        href="/my-events"
+        className="text-blue-500 border border-blue-500 px-2 py-1 rounded-md hover:bg-blue-500 hover:text-white"
+      >
+        Vos événements
+      </a>
+    );
   } else {
     return (
       <>
-        <h2 className="text-2xl text-center font-bold">Vos événements</h2>
+        <div className="flex">
+          <h2 className="text-2xl text-center font-bold">Vos événements</h2>
+          <a
+            href="/my-events"
+            className="ml-4 text-blue-500 border border-blue-500 px-2 py-1 rounded-md hover:bg-blue-500 hover:text-white"
+          >
+            Voir tout
+          </a>
+        </div>
         <div className="flex flex-nowrap overflow-x-auto w-full scroll-smooth">
           {events.map((event) => (
             <div
